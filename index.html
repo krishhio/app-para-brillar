@@ -1,0 +1,167 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App para Brillar - Tu Espacio de Crecimiento</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,700;1,9..144,400&family=Merriweather:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');
+    
+    :root {
+      /* Default Theme: Vibras Lima (Lime Vibes) */
+      --brilla-primary: #c4ef1a;
+      --brilla-primary-hover: #a8d30f;
+      --brilla-accent: #FFFFFF;
+      --brilla-accent-light: #E0E0E0; 
+      
+      --brilla-bg-gradient-from: #121212;
+      --brilla-bg-gradient-via: #000000;
+      --brilla-bg-gradient-to: #121212;
+      
+      --brilla-text-gradient-from: #c4ef1a;
+      --brilla-text-gradient-to: #FFFFFF;
+      
+      --brilla-scrollbar-thumb: #c4ef1a;
+      --brilla-scrollbar-thumb-hover: #a8d30f;
+      
+      --brilla-selection-bg: #c4ef1a;
+      --brilla-selection-text: #000000;
+
+      --brilla-daily-message-bg-from: rgba(196, 239, 26, 0.25);
+      --brilla-daily-message-bg-via: rgba(26, 26, 26, 0.5);
+      --brilla-daily-message-bg-to: rgba(196, 239, 26, 0.15);
+      
+      --brilla-button-secondary-bg: rgba(255, 255, 255, 0.08);
+      --brilla-button-secondary-hover-bg: rgba(255, 255, 255, 0.15);
+      --brilla-button-secondary-text: #c4ef1a;
+      
+      /* General color variables */
+      --brilla-text-primary: #FFFFFF; 
+      --brilla-text-secondary: #A0A0A0; 
+      --brilla-bg-base: #000000; 
+      --brilla-bg-surface: #1A1A1A; 
+      --brilla-bg-overlay: rgba(26, 26, 26, 0.8); 
+      --brilla-border-color: rgba(255, 255, 255, 0.1); 
+      --brilla-ring-color: var(--brilla-primary); 
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background-color: var(--brilla-bg-base);
+      color: var(--brilla-text-primary);
+    }
+    .quote-text {
+      font-family: 'Merriweather', serif;
+    }
+    .daily-frase-font {
+      font-family: 'Fraunces', serif;
+    }
+    .font-cinzel {
+      font-family: 'Cinzel', serif;
+    }
+    
+    /* Custom scrollbar using CSS Variables */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05); 
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--brilla-scrollbar-thumb);
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--brilla-scrollbar-thumb-hover);
+    }
+
+    /* Text Selection using CSS Variables */
+    ::selection {
+      background-color: var(--brilla-selection-bg);
+      color: var(--brilla-selection-text);
+    }
+    ::-moz-selection { /* For Firefox */
+      background-color: var(--brilla-selection-bg);
+      color: var(--brilla-selection-text);
+    }
+
+    /* Animation for menu dropdown */
+    .animate-fadeInScaleUp {
+      animation: fadeInScaleUp 0.2s ease-out forwards;
+    }
+    @keyframes fadeInScaleUp {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+
+    input[type="date"].date-input::-webkit-calendar-picker-indicator {
+        filter: invert(89%) sepia(52%) saturate(1205%) hue-rotate(21deg) brightness(96%) contrast(93%); 
+        cursor: pointer;
+        padding-left: 0.25rem;
+    }
+    input[type="date"].date-input {
+        color-scheme: dark; 
+        background-clip: padding-box; 
+    }
+    @supports (-moz-appearance: none) {
+      input[type="date"].date-input {
+        color: inherit; 
+      }
+    }
+
+    /* Confetti Animation */
+    .confetti-piece {
+      position: absolute;
+      width: 8px;
+      height: 16px;
+      opacity: 0;
+      animation: fall 3s ease-out forwards;
+    }
+
+    @keyframes fall {
+      0% {
+        opacity: 1;
+        transform: translateY(0px) rotateZ(0deg);
+      }
+      100% {
+        opacity: 0.8;
+        transform: translateY(150vh) rotateZ(360deg); /* Fall further down */
+      }
+    }
+  </style>
+<script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.1.0/",
+    "react": "https://esm.sh/react@^19.1.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.1.0/",
+    "@google/genai": "https://esm.sh/@google/genai@^1.0.1",
+    "lucide-react": "https://esm.sh/lucide-react@^0.417.0"
+  }
+}
+</script>
+</head>
+<body class="brilla-app"> 
+  <!-- App title in body for SEO or other purposes, actual app uses React for titles -->
+  <h1>App para Brillar - Tu Espacio de Crecimiento</h1>
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
+<link rel="stylesheet" href="index.css">
+<script src="index.tsx" type="module"></script>

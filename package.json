@@ -1,22 +1,66 @@
 {
   "name": "app-para-brillar",
-  "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "Aplicación de crecimiento personal y desarrollo emocional",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "type-check": "tsc --noEmit",
+    "mobile:android": "npm run build && npx cap sync && npx cap open android",
+    "mobile:ios": "npm run build && npx cap sync && npx cap open ios",
+    "mobile:sync": "npx cap sync",
+    "mobile:build": "npm run build && npx cap sync",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "@google/genai": "^1.0.1",
-    "lucide-react": "^0.417.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "lucide-react": "^0.263.1",
+    "@capacitor/core": "^5.5.0",
+    "@capacitor/cli": "^5.5.0",
+    "@capacitor/android": "^5.5.0",
+    "@capacitor/ios": "^5.5.0"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "typescript": "~5.7.2",
-    "vite": "^6.2.0"
-  }
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "@vitejs/plugin-react": "^4.0.3",
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "postcss": "^8.4.27",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.0.2",
+    "vite": "^4.4.5",
+    "vitest": "^0.34.4",
+    "@vitest/ui": "^0.34.4"
+  },
+  "keywords": [
+    "react",
+    "typescript",
+    "capacitor",
+    "mobile",
+    "growth",
+    "personal-development",
+    "gratitude",
+    "motivation"
+  ],
+  "author": "Candy Díaz & Equipo de Desarrollo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/app-para-brillar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tu-usuario/app-para-brillar/issues"
+  },
+  "homepage": "https://github.com/tu-usuario/app-para-brillar#readme"
 }

@@ -1,0 +1,183 @@
+@startuml App Para Brillar - Arquitectura de Alto Nivel
+
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+    FontColor DarkBlue
+}
+
+skinparam database {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+    FontColor DarkGreen
+}
+
+skinparam cloud {
+    BackgroundColor LightYellow
+    BorderColor DarkOrange
+    FontColor DarkOrange
+}
+
+' Usuario
+actor "Usuario" as USER
+actor "Administrador" as ADMIN
+
+' Frontend
+component "Frontend (React + TypeScript)" as FRONTEND {
+    component "Welcome Screen" as WELCOME
+    component "Home Screen" as HOME
+    component "Profile Page" as PROFILE
+    component "Gratitude Journal" as JOURNAL
+    component "Challenge Screen" as CHALLENGE
+    component "Chat AI Screen" as CHAT
+    component "Weekly Summary" as SUMMARY
+}
+
+' Backend
+component "Backend (Node.js + Express)" as BACKEND {
+    component "Auth Controller" as AUTH
+    component "User Controller" as USER_CTRL
+    component "Gratitude Controller" as GRATITUDE_CTRL
+    component "Quotes Controller" as QUOTES_CTRL
+    component "Challenges Controller" as CHALLENGES_CTRL
+    component "Achievements Controller" as ACHIEVEMENTS_CTRL
+    component "Chat Controller" as CHAT_CTRL
+    component "Themes Controller" as THEMES_CTRL
+}
+
+' Base de Datos
+database "MySQL 8.0 Database" as DB {
+    component "usuarios" as USERS_TABLE
+    component "diario_gratitud" as GRATITUDE_TABLE
+    component "catalogo_frases" as QUOTES_TABLE
+    component "catalogo_retos" as CHALLENGES_TABLE
+    component "catalogo_logros" as ACHIEVEMENTS_TABLE
+    component "chat_ia" as CHAT_TABLE
+    component "catalogo_colores_temas" as THEMES_TABLE
+    component "seguimiento_logros_usuario" as TRACKING_TABLE
+}
+
+' Servicios Externos
+cloud "Servicios Externos" as EXTERNAL {
+    cloud "Gemini AI API" as GEMINI
+    cloud "AWS S3" as S3
+    cloud "OpenAI API" as OPENAI
+}
+
+' Flujos principales
+USER --> FRONTEND : Accede a la app
+FRONTEND --> BACKEND : API Requests
+BACKEND --> DB : CRUD Operations
+BACKEND --> EXTERNAL : External APIs
+
+' Flujos específicos por funcionalidad
+
+' Autenticación
+USER --> WELCOME : Registro/Login
+WELCOME --> AUTH : Credenciales
+AUTH --> USERS_TABLE : Validar/Crear usuario
+AUTH --> FRONTEND : JWT Token
+
+' Navegación principal
+USER --> HOME : Pantalla principal
+HOME --> QUOTES_CTRL : Obtener frase del día
+QUOTES_CTRL --> QUOTES_TABLE : Consultar frases
+HOME --> ACHIEVEMENTS_CTRL : Ver logros
+ACHIEVEMENTS_CTRL --> ACHIEVEMENTS_TABLE : Consultar logros
+
+' Diario de Gratitud
+USER --> JOURNAL : Escribir entrada
+JOURNAL --> GRATITUDE_CTRL : Guardar entrada
+GRATITUDE_CTRL --> GRATITUDE_TABLE : Almacenar
+GRATITUDE_CTRL --> TRACKING_TABLE : Actualizar seguimiento
+
+' Retos Semanales
+USER --> CHALLENGE : Ver retos
+CHALLENGE --> CHALLENGES_CTRL : Obtener retos
+CHALLENGES_CTRL --> CHALLENGES_TABLE : Consultar
+CHALLENGE --> USER_CTRL : Actualizar progreso
+
+' Chat con IA
+USER --> CHAT : Enviar mensaje
+CHAT --> CHAT_CTRL : Procesar mensaje
+CHAT_CTRL --> GEMINI : Consultar IA
+GEMINI --> CHAT_CTRL : Respuesta IA
+CHAT_CTRL --> CHAT_TABLE : Guardar conversación
+CHAT_CTRL --> CHAT : Mostrar respuesta
+
+' Análisis Semanal
+SUMMARY --> GRATITUDE_CTRL : Obtener entradas semana
+GRATITUDE_CTRL --> GRATITUDE_TABLE : Consultar entradas
+SUMMARY --> OPENAI : Generar análisis
+OPENAI --> SUMMARY : Mostrar insights
+
+' Personalización
+USER --> PROFILE : Configurar perfil
+PROFILE --> USER_CTRL : Actualizar datos
+USER_CTRL --> USERS_TABLE : Guardar cambios
+PROFILE --> THEMES_CTRL : Cambiar tema
+THEMES_CTRL --> THEMES_TABLE : Obtener temas
+
+' Almacenamiento de archivos
+PROFILE --> USER_CTRL : Subir foto
+USER_CTRL --> S3 : Almacenar imagen
+S3 --> USER_CTRL : URL de imagen
+USER_CTRL --> USERS_TABLE : Guardar URL
+
+' Flujos de datos
+note right of FRONTEND
+  **Frontend Features:**
+  - React 18 + TypeScript
+  - Tailwind CSS
+  - Capacitor (iOS/Android)
+  - LocalStorage para caché
+end note
+
+note right of BACKEND
+  **Backend Features:**
+  - Express.js + Node.js
+  - JWT Authentication
+  - Rate Limiting
+  - Input Validation
+  - Error Handling
+end note
+
+note right of DB
+  **Database Features:**
+  - MySQL 8.0+
+  - JSON Support
+  - Optimized Indexes
+  - Triggers & Views
+  - Stored Procedures
+end note
+
+note right of EXTERNAL
+  **External Services:**
+  - Gemini AI (Chat)
+  - OpenAI (Analysis)
+  - AWS S3 (Files)
+  - Email Service
+end note
+
+' Estados de la aplicación
+note top of USER
+  **User Journey:**
+  1. Registro/Login
+  2. Configurar perfil
+  3. Usar funcionalidades
+  4. Ver progreso
+  5. Recibir insights
+end note
+
+' Arquitectura de datos
+note bottom of DB
+  **Data Flow:**
+  - User Data → Profile
+  - Journal Entries → Gratitude
+  - Daily Quotes → Messages
+  - AI Conversations → Chat
+  - Progress Tracking → Achievements
+  - Weekly Analysis → Summary
+end note
+
+@enduml 

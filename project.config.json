@@ -1,0 +1,128 @@
+{
+  "name": "App Para Brillar",
+  "version": "1.0.0",
+  "description": "Aplicación de crecimiento personal y desarrollo emocional",
+  "author": "Candy Díaz & Equipo de Desarrollo",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tu-usuario/app-para-brillar.git"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "npm run dev",
+    "dev:backend": "cd backend && npm run dev",
+    "build": "npm run build",
+    "build:backend": "cd backend && npm run build",
+    "test": "npm run test",
+    "test:backend": "cd backend && npm run test",
+    "lint": "npm run lint",
+    "lint:backend": "cd backend && npm run lint",
+    "db:setup": "mysql -u root -p < backend/src/database/schema.sql",
+    "db:seed": "mysql -u root -p app_para_brillar < backend/src/database/seed.sql",
+    "db:reset": "npm run db:setup && npm run db:seed",
+    "mobile:android": "npm run mobile:build && npx cap open android",
+    "mobile:ios": "npm run mobile:build && npx cap open ios",
+    "mobile:build": "npm run build && npx cap sync"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "config": {
+    "frontend": {
+      "port": 5173,
+      "url": "http://localhost:5173"
+    },
+    "backend": {
+      "port": 3000,
+      "url": "http://localhost:3000"
+    },
+    "database": {
+      "host": "localhost",
+      "port": 3306,
+      "name": "app_para_brillar",
+      "user": "root"
+    }
+  },
+  "features": {
+    "authentication": true,
+    "gratitude_journal": true,
+    "motivational_quotes": true,
+    "weekly_challenges": true,
+    "achievement_system": true,
+    "ai_chat": true,
+    "themes": true,
+    "mobile_app": true,
+    "analytics": false,
+    "notifications": false
+  },
+  "api": {
+    "base_url": "http://localhost:3000/api",
+    "version": "v1",
+    "endpoints": {
+      "auth": "/auth",
+      "users": "/users",
+      "gratitude": "/gratitude",
+      "quotes": "/quotes",
+      "challenges": "/challenges",
+      "achievements": "/achievements",
+      "chat": "/chat",
+      "themes": "/themes"
+    }
+  },
+  "database": {
+    "tables": [
+      "usuarios",
+      "diario_gratitud",
+      "catalogo_frases",
+      "catalogo_retos",
+      "catalogo_logros",
+      "catalogo_colores_temas",
+      "catalogo_sentimientos",
+      "chat_ia",
+      "resumen_semanal",
+      "seguimiento_logros_usuario",
+      "mensajes_diarios",
+      "logros_obtenidos",
+      "frases_usuario",
+      "retos_semanales"
+    ],
+    "views": [
+      "vista_estadisticas_usuario",
+      "vista_logros_disponibles"
+    ]
+  },
+  "themes": [
+    "lime-vibes",
+    "purple-reign",
+    "blue-breeze",
+    "emerald-glow",
+    "sunset-orange",
+    "pink-serenity",
+    "pure-canvas",
+    "modern-steel"
+  ],
+  "achievements": {
+    "categories": [
+      "constancia",
+      "accion",
+      "crecimiento",
+      "premium"
+    ]
+  },
+  "quotes": {
+    "categories": [
+      "🌿 Reconectando contigo",
+      "🧠 Mentalidad Resiliente",
+      "🔄 Cambiando tu camino",
+      "🎯 Propósito con sentido",
+      "✨ Auténticamente brillante",
+      "🔥 Poder Interior",
+      "🌗 Equilibrio Consciente"
+    ]
+  }
+} 

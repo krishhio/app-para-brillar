@@ -1,0 +1,222 @@
+@startuml App Para Brillar - Diagrama Entidad Relación
+
+!define ENTITY class
+!define PK <<PK>>
+!define FK <<FK>>
+!define UK <<UK>>
+
+' Configuración del diagrama
+skinparam class {
+    BackgroundColor White
+    BorderColor #2C3E50
+    ArrowColor #3498DB
+    FontColor #2C3E50
+}
+
+skinparam linetype ortho
+
+' Entidades Principales
+ENTITY USUARIOS {
+    PK id_usuario : INT
+    nombre : VARCHAR(100)
+    apellido : VARCHAR(100)
+    UK correo_electronico : VARCHAR(255)
+    fecha_nacimiento : DATE
+    fotografia : VARCHAR(500)
+    FK id_color_tema : INT
+    fecha_registro : TIMESTAMP
+    fecha_actualizacion : TIMESTAMP
+}
+
+ENTITY CATALOGO_COLORES_TEMAS {
+    PK id_color_tema : INT
+    UK nombre_tema : VARCHAR(50)
+    nombre_display : VARCHAR(100)
+    colores_tema : JSON
+    es_activo : BOOLEAN
+    fecha_creacion : TIMESTAMP
+}
+
+ENTITY CATALOGO_SENTIMIENTOS {
+    PK id_sentimiento : INT
+    UK nombre_sentimiento : VARCHAR(100)
+    emoji : VARCHAR(10)
+    descripcion : TEXT
+    es_activo : BOOLEAN
+}
+
+ENTITY CATALOGO_LOGROS {
+    PK id_logro : INT
+    nombre_logro : VARCHAR(150)
+    descripcion : TEXT
+    categoria : ENUM
+    icono_nombre : VARCHAR(50)
+    mensaje_desbloqueo : TEXT
+    condicion_activacion : TEXT
+    es_premium : BOOLEAN
+    es_activo : BOOLEAN
+    fecha_creacion : TIMESTAMP
+}
+
+ENTITY CATALOGO_FRASES {
+    PK id_frase : INT
+    id_categoria_frase : INT
+    nombre_frase : VARCHAR(500)
+    autor : VARCHAR(100)
+    categoria : VARCHAR(100)
+    es_activo : BOOLEAN
+    fecha_creacion : TIMESTAMP
+}
+
+ENTITY CATALOGO_RETOS {
+    PK id_reto : INT
+    nombre_reto : VARCHAR(200)
+    descripcion : TEXT
+    categoria : VARCHAR(100)
+    duracion_dias : INT
+    es_activo : BOOLEAN
+    fecha_creacion : TIMESTAMP
+}
+
+' Entidades de Relación
+ENTITY LOGROS_OBTENIDOS {
+    PK id_logro_obtenido : INT
+    FK id_usuario : INT
+    FK id_logro : INT
+    fecha_obtencion : TIMESTAMP
+}
+
+ENTITY FRASES_USUARIO {
+    PK id_frase_usuario : INT
+    FK id_usuario : INT
+    FK id_frase : INT
+    fecha_frase : TIMESTAMP
+    estatus : ENUM
+    es_favorito : BOOLEAN
+}
+
+ENTITY RETOS_SEMANALES {
+    PK id_reto_semanal : INT
+    FK id_usuario : INT
+    FK id_reto : INT
+    dia_reto : INT
+    nota_reto : TEXT
+    fecha_inicio : DATE
+    fecha_fin : DATE
+    estatus : ENUM
+    fecha_creacion : TIMESTAMP
+    fecha_actualizacion : TIMESTAMP
+}
+
+ENTITY DIARIO_GRATITUD {
+    PK id_entrada : INT
+    FK id_usuario : INT
+    fecha_escritura : DATE
+    FK id_sentimiento : INT
+    logros : JSON
+    agradecimientos : JSON
+    mejor_parte_dia : TEXT
+    aprendi_hoy : TEXT
+    convirtiendo_negativo_positivo : JSON
+    pensamientos_dia : TEXT
+    timestamp_creacion : BIGINT
+    fecha_creacion : TIMESTAMP
+    fecha_actualizacion : TIMESTAMP
+}
+
+' Entidades de Seguimiento
+ENTITY SEGUIMIENTO_LOGROS_USUARIO {
+    PK id_seguimiento : INT
+    FK id_usuario : INT
+    fechas_mensaje_diario : JSON
+    frases_compartidas : JSON
+    contador_cambios_tema : INT
+    diario_primera_vez_click : BOOLEAN
+    diario_primera_entrada : BOOLEAN
+    contador_entradas_gratitud : INT
+    retos_visitados : BOOLEAN
+    fecha_creacion : TIMESTAMP
+    fecha_actualizacion : TIMESTAMP
+}
+
+ENTITY MENSAJES_DIARIOS {
+    PK id_mensaje_diario : INT
+    FK id_usuario : INT
+    FK id_frase : INT
+    fecha_asignacion : DATE
+    fecha_visualizacion : TIMESTAMP
+}
+
+ENTITY CHAT_IA {
+    PK id_chat : INT
+    FK id_usuario : INT
+    id_mensaje : VARCHAR(50)
+    remitente : ENUM
+    contenido : TEXT
+    timestamp : BIGINT
+    fecha_creacion : TIMESTAMP
+}
+
+ENTITY RESUMEN_SEMANAL {
+    PK id_resumen : INT
+    FK id_usuario : INT
+    fecha_inicio_semana : DATE
+    fecha_fin_semana : DATE
+    resumen_generado : TEXT
+    insights : JSON
+    fecha_creacion : TIMESTAMP
+}
+
+' Relaciones principales
+USUARIOS ||--o{ LOGROS_OBTENIDOS : "obtiene"
+CATALOGO_LOGROS ||--o{ LOGROS_OBTENIDOS : "es obtenido por"
+
+USUARIOS ||--o{ FRASES_USUARIO : "tiene"
+CATALOGO_FRASES ||--o{ FRASES_USUARIO : "es favorita de"
+
+USUARIOS ||--o{ RETOS_SEMANALES : "participa en"
+CATALOGO_RETOS ||--o{ RETOS_SEMANALES : "es asignado como"
+
+USUARIOS ||--o{ DIARIO_GRATITUD : "escribe"
+CATALOGO_SENTIMIENTOS ||--o{ DIARIO_GRATITUD : "se siente"
+
+USUARIOS ||--|| SEGUIMIENTO_LOGROS_USUARIO : "tiene seguimiento"
+
+USUARIOS ||--o{ MENSAJES_DIARIOS : "recibe"
+CATALOGO_FRASES ||--o{ MENSAJES_DIARIOS : "es asignada como"
+
+USUARIOS ||--o{ CHAT_IA : "conversa"
+
+USUARIOS ||--o{ RESUMEN_SEMANAL : "genera"
+
+USUARIOS }o--|| CATALOGO_COLORES_TEMAS : "usa tema"
+
+' Notas del diagrama
+note top of USUARIOS
+  **Entidad Central**
+  Contiene toda la información
+  del perfil del usuario
+end note
+
+note right of CATALOGO_COLORES_TEMAS
+  **Temas Visuales**
+  Almacena configuraciones
+  de colores en formato JSON
+end note
+
+note left of DIARIO_GRATITUD
+  **Diario Personal**
+  Entradas diarias con:
+  - Sentimientos
+  - Logros
+  - Agradecimientos
+  - Reflexiones
+end note
+
+note bottom of SEGUIMIENTO_LOGROS_USUARIO
+  **Tracking Interno**
+  Seguimiento de progreso
+  para desbloquear logros
+end note
+
+@enduml 

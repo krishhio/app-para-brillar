@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { LoaderCircle } from 'lucide-react';
+// import { LoaderCircle } from 'lucide-react';
 
 interface LoadingSpinnerProps {
   message?: string;
@@ -10,7 +9,8 @@ interface LoadingSpinnerProps {
 const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ message = "Cargando...", size = 12 }) => {
   return (
     <div className="flex flex-col justify-center items-center p-10 min-h-screen bg-gradient-to-br from-[var(--brilla-bg-gradient-from)] via-[var(--brilla-bg-gradient-via)] to-[var(--brilla-bg-gradient-to)] text-[var(--brilla-text-primary)]">
-      <LoaderCircle className={`animate-spin h-${size} w-${size} text-[var(--brilla-accent-light)]`} />
+      {/* <LoaderCircle className={`animate-spin h-${size} w-${size} text-[var(--brilla-accent-light)]`} /> */}
+      <span className={`inline-block rounded-full border-4 border-[var(--brilla-accent-light)] border-t-transparent animate-spin`} style={{ width: size * 4, height: size * 4 }} />
       <p className="mt-4 text-xl text-[var(--brilla-accent-light)] opacity-80">{message}</p>
     </div>
   );

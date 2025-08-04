@@ -94,8 +94,8 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 // Iniciar servidor
-app.listen(PORT, () => {
-  logger.info(`🚀 Servidor iniciado en puerto ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  logger.info(`🚀 Servidor iniciado en 0.0.0.0:${PORT}`);
   logger.info(`📊 Health check disponible en http://localhost:${PORT}/health`);
   logger.info(`🔗 API base URL: http://localhost:${PORT}/api`);
 });
@@ -111,4 +111,4 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-module.exports = app; 
+module.exports = app;

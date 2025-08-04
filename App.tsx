@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { MotivationalQuote, ChatMessage, UserProfile, View, ThemeName, Achievement, ALL_ACHIEVEMENTS, FeelingOption, FEELING_OPTIONS, GratitudeEntry } from './types';
 import { themes, getTheme, DEFAULT_THEME_NAME } from './themes'; 
@@ -12,6 +11,8 @@ import WeeklySummaryScreen from './components/WeeklySummaryScreen';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorDisplay from './components/ErrorDisplay';
 import AchievementNotification from './components/AchievementNotification';
+import LoginScreen from './components/LoginScreen';
+import { getUserProfile } from './services/userService';
 
 const APP_PREFIX = 'brilla_';
 const WELCOME_SHOWN_KEY = `${APP_PREFIX}welcome_shown_v1`;
@@ -26,6 +27,9 @@ const USER_CHAT_COUNT_KEY = `${APP_PREFIX}user_chat_count`;
 const USER_CHAT_RESET_MONTH_KEY = `${APP_PREFIX}user_chat_reset_month`;
 
 const PREMIUM_ACHIEVEMENT_ID = 'brilla-libro';
+const TOKEN_KEY = `${APP_PREFIX}access_token`;
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
 const applyThemeToDocument = (themeName?: ThemeName) => {
   const theme = getTheme(themeName);
@@ -61,6 +65,9 @@ const App: React.FC = () => {
   const [loadingMessage, setLoadingMessage] = useState<string>('Inicializando App para Brillar...');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [apiKeyError, setApiKeyError] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null); // Ya no usar localStorage
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const [userChatMessagesUsedThisMonth, setUserChatMessagesUsedThisMonth] = useState<number>(0);
   const [userChatResetMonth, setUserChatResetMonth] = useState<string>('');
@@ -118,6 +125,14 @@ const App: React.FC = () => {
     if (apiKeyError) return;
     setLoadingMessage('Cargando tus datos...');
     try {
+      const token = localStorage.getItem(TOKEN_KEY);
+      setToken(token);
+
+      if (!token) {
+        setView('login');
+        return;
+      }
+
       const welcomeShown = localStorage.getItem(WELCOME_SHOWN_KEY) === 'true';
       const storedFeeling = localStorage.getItem(SELECTED_FEELING_KEY) as FeelingOption | null;
       const storedFavorites = JSON.parse(localStorage.getItem(FAVORITE_MESSAGES_KEY) || '[]') as MotivationalQuote[];
@@ -138,11 +153,7 @@ const App: React.FC = () => {
       setUserProfile(initializedProfile);
       applyThemeToDocument(initializedProfile.theme);
       
-      if (!welcomeShown && !storedUserProfileData) { 
-         setView('welcome');
-      } else {
-         setView('welcome'); 
-      }
+      setView('welcome');
 
     } catch (e) {
       console.error("Error loading from localStorage:", e);
@@ -199,7 +210,7 @@ const App: React.FC = () => {
         unlockAchievement('color-con-intencion');
       }
       if (count >= 5 && !userProfile.unlockedAchievements['cambio-consciente']) {
-        unlockAchievement('cambio-consciente');
+        unlockAchievement('cambio-con-sciente');
       }
     }
   }, [userProfile?.achievementTracking?.themeChangesCount, userProfile?.unlockedAchievements, unlockAchievement]);
@@ -456,6 +467,88 @@ const App: React.FC = () => {
   }, []);
 
 
+  // Función para login real
+  const handleLogin = (email: string, password: string, remember?: boolean) => {
+    setLoginLoading(true);
+    setLoginError(null);
+    // Asegura que no se envíen espacios accidentales
+    const cleanEmail = email.trim();
+    const cleanPassword = password.trim();
+    fetch(`${API_URL}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ correo_electronico: cleanEmail, password: cleanPassword })
+    })
+      .then(async res => {
+        console.log('Respuesta login:', res);
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('Error login:', errorText);
+          throw new Error('Credenciales incorrectas');
+        }
+        const data = await res.json();
+        console.log('Login exitoso, data:', data);
+        setToken(data.data.token);
+        setLoginLoading(false);
+      })
+      .catch(err => {
+        setLoginError(err.message || 'Error de autenticación');
+        setLoginLoading(false);
+      });
+  };
+
+
+  // Panel de depuración para mostrar el token (solo en desarrollo)
+  const DebugTokenPanel = () => (
+    process.env.NODE_ENV === 'development' && token ? (
+      <div style={{
+        position: 'fixed',
+        bottom: 10,
+        right: 10,
+        background: 'rgba(0,0,0,0.7)',
+        color: '#fff',
+        padding: '10px 16px',
+        borderRadius: 8,
+        fontSize: 12,
+        zIndex: 9999,
+        maxWidth: 400,
+        wordBreak: 'break-all',
+      }}>
+        <strong>Token JWT:</strong>
+        <div style={{ fontSize: 10, marginTop: 4 }}>{token}</div>
+        <div style={{ marginTop: 8 }}><strong>Vista actual:</strong> {view}</div>
+      </div>
+    ) : null
+  );
+
+
+  // useEffect para cargar perfil y avanzar tras login exitoso
+  useEffect(() => {
+    if (!token) return;
+    setLoadingMessage('Cargando perfil de usuario...');
+    getUserProfile(token)
+      .then(profile => {
+        setUserProfile({
+          name: profile.nombre,
+          email: profile.correo_electronico,
+          birthDate: profile.fecha_nacimiento || '',
+          photoUrl: profile.fotografia,
+          theme: profile.id_color_tema || DEFAULT_THEME_NAME,
+          selectedFeeling: null,
+          unlockedAchievements: {},
+          achievementTracking: { ...defaultAchievementTrackingState },
+        });
+        applyThemeToDocument(profile.id_color_tema || DEFAULT_THEME_NAME);
+        setView('welcome');
+        setLoadingMessage('');
+      })
+      .catch(err => {
+        setLoginError('No se pudo cargar el perfil.');
+        setToken(null);
+        setLoadingMessage('');
+      });
+  }, [token]);
+
   if (view === 'loading' && !apiKeyError) return <LoadingSpinner message={loadingMessage} />;
   if (view === 'error' || apiKeyError) return (
     <div className="min-h-screen bg-gradient-to-br from-[var(--brilla-bg-gradient-from)] via-[var(--brilla-bg-gradient-via)] to-[var(--brilla-bg-gradient-to)] flex flex-col items-center justify-center p-6">
@@ -503,6 +596,7 @@ const App: React.FC = () => {
           onGratitudeJournalLinkClicked={handleGratitudeJournalLinkClicked} 
           selectedFeeling={selectedFeeling}
         />
+        <DebugTokenPanel />
         </>
       );
     case 'home':
@@ -527,6 +621,7 @@ const App: React.FC = () => {
           navigateToChallengeDetail={() => { setView('challengeDetail'); handleChallengeVisited(); }}
           navigateToWelcome={() => setView('welcome')}
         />
+        <DebugTokenPanel />
         </>
       );
     case 'profile':
@@ -542,6 +637,7 @@ const App: React.FC = () => {
           allAchievements={ALL_ACHIEVEMENTS}
           unlockedAchievements={userProfile?.unlockedAchievements || {}}
         />
+        <DebugTokenPanel />
         </>
       );
     case 'chatAI':
@@ -558,6 +654,7 @@ const App: React.FC = () => {
           onFreeMessageSent={handleFreeMessageSent}
           isPremiumUser={isUserPremium}
         />
+        <DebugTokenPanel />
         </>
       );
     case 'challengeDetail':
@@ -565,6 +662,7 @@ const App: React.FC = () => {
           <>
           {achievementPopup}
           <ChallengeScreen onNavigateBack={() => setView('welcome')} />
+          <DebugTokenPanel />
           </>
         );
     case 'gratitudeJournal': 
@@ -577,6 +675,7 @@ const App: React.FC = () => {
             onNavigateBack={() => setView('welcome')}
             onNavigateToWeeklySummary={() => setView('weeklySummary')}
           />
+          <DebugTokenPanel />
           </>
         );
     case 'weeklySummary':
@@ -588,8 +687,16 @@ const App: React.FC = () => {
                 onNavigateBack={() => setView('gratitudeJournal')}
                 isPremiumUser={isUserPremium} 
             />
+            <DebugTokenPanel />
             </>
         );
+    case 'login':
+      return (
+        <>
+        <LoginScreen onLogin={handleLogin} loading={loginLoading} error={loginError} />
+        <DebugTokenPanel />
+        </>
+      );
     default:
       return <LoadingSpinner message="Redirigiendo..." />;
   }

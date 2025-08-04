@@ -1,8 +1,7 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '../types';
 import { geminiService } from '../services/geminiService';
-import { Send, CornerDownLeft, MessageSquarePlus, LoaderCircle, User, Sparkles, LockKeyhole, ArrowRight } from 'lucide-react';
+import { Send, CornerDownLeft, MessageSquarePlus, User, Sparkles, ArrowRight } from 'lucide-react';
 
 interface ChatAIProps {
   chatMessages: ChatMessage[];
@@ -158,7 +157,8 @@ const ChatAI: React.FC<ChatAIProps> = ({
           <div className="flex justify-start">
             <div className="max-w-[70%] sm:max-w-[65%] p-3 sm:p-3.5 rounded-xl shadow bg-[var(--brilla-bg-base)] text-[var(--brilla-text-primary)] rounded-bl-none">
               <div className="flex items-center space-x-2">
-                <LoaderCircle size={18} className="animate-spin text-[var(--brilla-accent-light)] flex-shrink-0" />
+                {/* <LoaderCircle size={18} className="animate-spin text-[var(--brilla-accent-light)] flex-shrink-0" /> */}
+                <span className="inline-block w-4 h-4 rounded-full border-2 border-[var(--brilla-accent-light)] border-t-transparent animate-spin"></span>
                 <p className="text-sm sm:text-base italic">Brilla AI está escribiendo...</p>
               </div>
             </div>
@@ -170,7 +170,8 @@ const ChatAI: React.FC<ChatAIProps> = ({
       <div className="p-3 sm:p-4 border-t border-[var(--brilla-border-color)]">
         {isLocked ? (
           <div className="text-center p-4 bg-gradient-to-r from-[var(--brilla-primary)]/10 via-transparent to-[var(--brilla-primary)]/10 border border-[var(--brilla-primary)]/30 rounded-lg">
-            <LockKeyhole size={32} className="mx-auto mb-2 text-[var(--brilla-primary)]" />
+            {/* <LockKeyhole size={32} className="mx-auto mb-2 text-[var(--brilla-primary)]" /> */}
+            <span className="inline-block w-8 h-8 rounded-full border-4 border-[var(--brilla-primary)] border-t-transparent animate-spin mx-auto mb-2"></span>
             <h4 className="text-md font-semibold text-[var(--brilla-accent-light)]">Límite de mensajes alcanzado</h4>
             <p className="text-xs text-[var(--brilla-text-secondary)] mt-1 mb-3">
               {isPremiumUser ? "Error inesperado con el límite de mensajes." : "Has utilizado tus 3 mensajes gratuitos de este mes."}

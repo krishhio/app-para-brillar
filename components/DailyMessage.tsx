@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { MotivationalQuote, FeelingOption, FEELING_TO_CATEGORIES_MAP } from '../types'; // Updated imports
 import { USER_QUOTES } from '../services/userQuotes'; 
-import { Heart, Share2, LoaderCircle, AlertTriangle, Copy, LockKeyhole } from 'lucide-react';
+import { Heart, Share2, AlertTriangle, Copy } from 'lucide-react';
 
 interface DailyMessageProps {
   selectedFeeling: FeelingOption | null; // Updated prop
@@ -162,7 +161,10 @@ const DailyMessage: React.FC<DailyMessageProps> = ({
   if (isLoading) {
     return (
       <div className="bg-[var(--brilla-bg-surface)] opacity-80 backdrop-blur-sm shadow-xl rounded-xl p-8 md:p-10 h-64 flex flex-col items-center justify-center text-center">
-        <LoaderCircle className="animate-spin h-10 w-10 text-[var(--brilla-accent-light)] mb-3" />
+        {/* <LoaderCircle className="animate-spin h-10 w-10 text-[var(--brilla-accent-light)] mb-3" /> */}
+        <div className="animate-spin h-10 w-10 text-[var(--brilla-accent-light)] mb-3 flex items-center justify-center">
+          <svg width="40" height="40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10" strokeWidth="4" opacity="0.2"/><path d="M4 12a8 8 0 018-8" strokeWidth="4" strokeLinecap="round"/></svg>
+        </div>
         <p className="text-lg text-[var(--brilla-accent-light)]">Buscando tu inspiración...</p>
       </div>
     );
@@ -231,13 +233,13 @@ const DailyMessage: React.FC<DailyMessageProps> = ({
         >
           {copied ? <Copy size={18} className="text-green-400" /> : <Share2 size={18} />}
         </button>
-        <button
+        {/* <button
           onClick={() => window.open(PREMIUM_INFO_URL, '_blank', 'noopener noreferrer')}
           className="px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg text-xs sm:text-sm font-semibold bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 hover:from-yellow-500 hover:via-amber-600 hover:to-orange-600 text-white shadow-md hover:shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 flex items-center group"
           title="Desbloquea más cartas y contenido exclusivo con Premium"
         >
           <LockKeyhole size={16} className="mr-1.5 transition-transform group-hover:rotate-[-10deg] group-hover:scale-110" /> Ver más (Premium)
-        </button>
+        </button> */}
       </div>
     </div>
   );

@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { GratitudeEntry, EmojiFeeling, EMOJI_LABELS } from '../types';
 import { geminiService } from '../services/geminiService'; 
-import { ArrowLeft, BarChart2, Smile, CheckCircle, Gift, Brain, TrendingUp, Info, Star, LoaderCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, BarChart2, Smile, CheckCircle, Gift, Brain, TrendingUp, Info, Star, AlertTriangle } from 'lucide-react';
 
 interface WeeklySummaryScreenProps {
   entries: GratitudeEntry[];
@@ -168,7 +167,8 @@ const WeeklySummaryScreen: React.FC<WeeklySummaryScreenProps> = ({ entries, onNa
                  <h3 className="text-lg font-semibold text-[var(--brilla-accent-light)] mb-3 flex items-center"><Brain className="mr-2 text-sky-400" size={22}/>Análisis con Brilla AI</h3>
                 {isAnalysisLoading && (
                     <div className="flex flex-col items-center justify-center p-6 text-center">
-                        <LoaderCircle size={32} className="animate-spin text-[var(--brilla-primary)] mb-3" />
+                        {/* <LoaderCircle size={32} className="animate-spin text-[var(--brilla-primary)] mb-3" /> */}
+                        <span className="inline-block w-8 h-8 rounded-full border-4 border-[var(--brilla-primary)] border-t-transparent animate-spin mb-3"></span>
                         <p className="text-[var(--brilla-text-secondary)]">Brilla AI está analizando tu semana...</p>
                     </div>
                 )}

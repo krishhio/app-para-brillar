@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Variables personalizadas para los gradientes y colores de la app */
+:root {
+  --brilla-bg-gradient-from: #e0e7ff;
+  --brilla-bg-gradient-via: #f0fdfa;
+  --brilla-bg-gradient-to: #f5f3ff;
+  --brilla-primary: #6366f1;
+  --brilla-primary-dark: #4338ca;
+  --brilla-accent: #f472b6;
+  --brilla-accent-light: #fbcfe8;
+  --brilla-bg-surface: #fff;
+  --brilla-selection-text: #fff;
+  --brilla-button-secondary-bg: #f3f4f6;
+  --brilla-button-secondary-hover-bg: #e5e7eb;
+  --brilla-daily-message-bg-from: #fdf2f8;
+  --brilla-daily-message-bg-via: #f3e8ff;
+  --brilla-daily-message-bg-to: #e0e7ff;
+}

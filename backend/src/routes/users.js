@@ -14,7 +14,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     const userId = req.user.id;
     
     const user = await executeQuery(
-      'SELECT id, nombre, apellido, email, fecha_nacimiento, foto_url, tema_id, fecha_creacion FROM usuarios WHERE id = ?',
+      'SELECT id_usuario, nombre, apellido, correo_electronico, fecha_nacimiento, fotografia, id_color_tema, fecha_registro FROM usuarios WHERE id_usuario = ?',
       [userId]
     );
 
@@ -48,9 +48,9 @@ router.get('/me', authMiddleware, async (req, res) => {
 router.put('/me', authMiddleware, [
   body('nombre').optional().isLength({ min: 2, max: 50 }).withMessage('El nombre debe tener entre 2 y 50 caracteres'),
   body('apellido').optional().isLength({ min: 2, max: 50 }).withMessage('El apellido debe tener entre 2 y 50 caracteres'),
-  body('email').optional().isEmail().withMessage('Email inválido'),
+  body('correo_electronico').optional().isEmail().withMessage('Correo electrónico inválido'),
   body('fecha_nacimiento').optional().isISO8601().withMessage('Fecha de nacimiento inválida'),
-  body('tema_id').optional().isInt().withMessage('ID de tema inválido')
+  body('id_color_tema').optional().isInt().withMessage('ID de tema inválido')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -66,20 +66,20 @@ router.put('/me', authMiddleware, [
     }
 
     const userId = req.user.id;
-    const { nombre, apellido, email, fecha_nacimiento, tema_id } = req.body;
+    const { nombre, apellido, correo_electronico, fecha_nacimiento, id_color_tema } = req.body;
 
-    // Verificar que el email no esté en uso por otro usuario
-    if (email) {
+    // Verificar que el correo_electronico no esté en uso por otro usuario
+    if (correo_electronico) {
       const existingUser = await executeQuery(
-        'SELECT id FROM usuarios WHERE email = ? AND id != ?',
-        [email, userId]
+        'SELECT id_usuario FROM usuarios WHERE correo_electronico = ? AND id_usuario != ?',
+        [correo_electronico, userId]
       );
 
       if (existingUser.length > 0) {
         return res.status(409).json({
           success: false,
           error: {
-            message: 'El email ya está en uso',
+            message: 'El correo electrónico ya está en uso',
             code: 'EMAIL_ALREADY_EXISTS'
           }
         });
@@ -98,17 +98,17 @@ router.put('/me', authMiddleware, [
       updateFields.push('apellido = ?');
       updateValues.push(apellido);
     }
-    if (email) {
-      updateFields.push('email = ?');
-      updateValues.push(email);
+    if (correo_electronico) {
+      updateFields.push('correo_electronico = ?');
+      updateValues.push(correo_electronico);
     }
     if (fecha_nacimiento) {
       updateFields.push('fecha_nacimiento = ?');
       updateValues.push(fecha_nacimiento);
     }
-    if (tema_id) {
-      updateFields.push('tema_id = ?');
-      updateValues.push(tema_id);
+    if (id_color_tema) {
+      updateFields.push('id_color_tema = ?');
+      updateValues.push(id_color_tema);
     }
 
     if (updateFields.length === 0) {
@@ -121,14 +121,20 @@ router.put('/me', authMiddleware, [
       });
     }
 
+    // Log de depuración para ver la consulta y los valores
+    logger.debug('Actualización de perfil', {
+      updateQuery: `UPDATE usuarios SET ${updateFields.join(', ')} WHERE id_usuario = ?`,
+      updateValues: [...updateValues, userId]
+    });
+
     updateValues.push(userId);
-    const updateQuery = `UPDATE usuarios SET ${updateFields.join(', ')} WHERE id = ?`;
+    const updateQuery = `UPDATE usuarios SET ${updateFields.join(', ')} WHERE id_usuario = ?`;
 
     await executeQuery(updateQuery, updateValues);
 
     // Obtener usuario actualizado
     const updatedUser = await executeQuery(
-      'SELECT id, nombre, apellido, email, fecha_nacimiento, foto_url, tema_id, fecha_creacion FROM usuarios WHERE id = ?',
+      'SELECT id_usuario, nombre, apellido, correo_electronico, fecha_nacimiento, fotografia, id_color_tema, fecha_registro FROM usuarios WHERE id_usuario = ?',
       [userId]
     );
 
@@ -174,7 +180,7 @@ router.put('/me/password', authMiddleware, [
 
     // Obtener contraseña actual
     const user = await executeQuery(
-      'SELECT password_hash FROM usuarios WHERE id = ?',
+      'SELECT password_hash FROM usuarios WHERE id_usuario = ?',
       [userId]
     );
 
@@ -206,7 +212,7 @@ router.put('/me/password', authMiddleware, [
 
     // Actualizar contraseña
     await executeQuery(
-      'UPDATE usuarios SET password_hash = ? WHERE id = ?',
+      'UPDATE usuarios SET password_hash = ? WHERE id_usuario = ?',
       [newPasswordHash, userId]
     );
 
@@ -244,7 +250,7 @@ router.delete('/me', authMiddleware, async (req, res) => {
     await executeQuery('DELETE FROM mensajes_diarios WHERE usuario_id = ?', [userId]);
 
     // Eliminar usuario
-    await executeQuery('DELETE FROM usuarios WHERE id = ?', [userId]);
+    await executeQuery('DELETE FROM usuarios WHERE id_usuario = ?', [userId]);
 
     logger.info('User account deleted', { userId: userId });
 
@@ -264,4 +270,4 @@ router.delete('/me', authMiddleware, async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;

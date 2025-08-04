@@ -55,17 +55,22 @@ Invoke-WebRequest -Uri "http://localhost:3000/api/auth/login" `
 
 ### Refresh token
 
-#### Opción tradicional
+> **Importante:** Debes enviar el valor de `refreshToken` (no el access token) en el cuerpo de la petición.
+
+#### Opción tradicional (curl)
 ```sh
 curl -X POST http://localhost:3000/api/auth/refresh \
-  -H "Authorization: Bearer TU_TOKEN"
+  -H "Content-Type: application/json" \
+  -d '{"refreshToken":"TU_REFRESH_TOKEN"}'
 ```
 
 #### Opción PowerShell
 ```powershell
+$body = @{ refreshToken = "TU_REFRESH_TOKEN" } | ConvertTo-Json
 Invoke-WebRequest -Uri "http://localhost:3000/api/auth/refresh" `
   -Method POST `
-  -Headers @{ Authorization = "Bearer TU_TOKEN" }
+  -Body $body `
+  -ContentType "application/json"
 ```
 
 ### Logout
@@ -121,13 +126,22 @@ Invoke-WebRequest -Uri "http://localhost:3000/api/users/me" `
 curl -X PUT http://localhost:3000/api/users/me \
   -H "Authorization: Bearer TU_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"nombre":"Juan","apellido":"Pérez"}'
+  -d '{
+    "nombre": "Juan",
+    "apellido": "Pérez",
+    "correo_electronico": "juan.perez@email.com",
+    "fecha_nacimiento": "1990-01-01",
+    "id_color_tema": 2
+  }'
 ```
 #### Opción PowerShell
 ```powershell
 $body = @{
   nombre = "Juan"
   apellido = "Pérez"
+  correo_electronico = "juan.perez@email.com"
+  fecha_nacimiento = "1990-01-01"
+  id_color_tema = 2
 } | ConvertTo-Json
 Invoke-WebRequest -Uri "http://localhost:3000/api/users/me" `
   -Method PUT `
@@ -135,6 +149,8 @@ Invoke-WebRequest -Uri "http://localhost:3000/api/users/me" `
   -Body $body `
   -ContentType "application/json"
 ```
+
+> Puedes omitir los campos que no quieras actualizar. Todos son opcionales, pero al menos uno debe estar presente.
 
 ### Cambiar contraseña
 #### Opción tradicional

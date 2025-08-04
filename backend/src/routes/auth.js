@@ -4,7 +4,8 @@ const jwt = require('jsonwebtoken');
 const { body, validationResult } = require('express-validator');
 const router = express.Router();
 
-const db = require('../database/connection');
+const { executeQuery } = require('../database/connection');
+const { authMiddleware } = require('../middleware/auth');
 const logger = require('../utils/logger');
 
 // Middleware de validación
@@ -40,7 +41,7 @@ router.post('/register', validateRegistration, async (req, res) => {
     const { nombre, apellido, correo_electronico, password, fecha_nacimiento } = req.body;
 
     // Verificar si el usuario ya existe
-    const [existingUser] = await db.execute(
+    const existingUser = await executeQuery(
       'SELECT id_usuario FROM usuarios WHERE correo_electronico = ?',
       [correo_electronico]
     );
@@ -60,7 +61,7 @@ router.post('/register', validateRegistration, async (req, res) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Insertar nuevo usuario
-    const [result] = await db.execute(
+    const result = await executeQuery(
       `INSERT INTO usuarios (nombre, apellido, correo_electronico, password_hash, fecha_nacimiento) 
        VALUES (?, ?, ?, ?, ?)`,
       [nombre, apellido, correo_electronico, passwordHash, fecha_nacimiento]
@@ -69,7 +70,7 @@ router.post('/register', validateRegistration, async (req, res) => {
     const userId = result.insertId;
 
     // Crear registro de seguimiento de logros
-    await db.execute(
+    await executeQuery(
       'INSERT INTO seguimiento_logros_usuario (id_usuario) VALUES (?)',
       [userId]
     );
@@ -137,7 +138,7 @@ router.post('/login', validateLogin, async (req, res) => {
     const { correo_electronico, password } = req.body;
 
     // Buscar usuario
-    const [users] = await db.execute(
+    const users = await executeQuery(
       `SELECT id_usuario, nombre, apellido, password_hash, es_activo 
        FROM usuarios WHERE correo_electronico = ?`,
       [correo_electronico]
@@ -179,7 +180,7 @@ router.post('/login', validateLogin, async (req, res) => {
     }
 
     // Actualizar último acceso
-    await db.execute(
+    await executeQuery(
       'UPDATE usuarios SET ultimo_acceso = CURRENT_TIMESTAMP WHERE id_usuario = ?',
       [user.id_usuario]
     );
@@ -245,8 +246,8 @@ router.post('/refresh', async (req, res) => {
     // Verificar refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-    // Verificar que el usuario existe y está activo
-    const [users] = await db.execute(
+    // Verificar que el usuario existe y está activo (refresh)
+    const users = await executeQuery(
       'SELECT id_usuario, correo_electronico, es_activo FROM usuarios WHERE id_usuario = ?',
       [decoded.userId]
     );
@@ -330,11 +331,12 @@ router.post('/logout', async (req, res) => {
 });
 
 // GET /api/auth/me - Obtener información del usuario actual
-router.get('/me', async (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
-    const [users] = await db.execute(
+    // Obtener información del usuario actual (me)
+    const users = await executeQuery(
       `SELECT id_usuario, nombre, apellido, correo_electronico, fecha_nacimiento, 
               fotografia, id_color_tema, fecha_registro, ultimo_acceso
        FROM usuarios WHERE id_usuario = ? AND es_activo = TRUE`,
@@ -382,4 +384,4 @@ router.get('/me', async (req, res) => {
   }
 });
 
-module.exports = router; 
+module.exports = router;
